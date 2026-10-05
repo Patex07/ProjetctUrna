@@ -1,5 +1,6 @@
 from code.candidatos import Gerenciador_candidatos
 from code.screen import Screen
+from code.votos import Votes
 
 gerenciador = Gerenciador_candidatos()
 
@@ -16,6 +17,10 @@ gerenciador.add_candidato(
     foto = 'tste2'
 )
 
+vote = '71'
+
+votacao = Votes(gerenciador = gerenciador, numero_digitado= vote )
+votacao.valida_votes()
 
 urna = Screen()
 urna.run()
