@@ -1,12 +1,19 @@
 #cadastro dos candidatos
 import os.path
+from dataclasses import dataclass
 
-class Candidatos:
-    def __init__(self, numero:str, nome :str, cargo: str, foto:str):
-        self.numero = str(numero)
-        self.nome = nome.upper()
-        self.cargo = cargo.upper()
-        self.foto =  foto
+# Usar dataclass limpa o código e cria um __init__ e um __repr__ automáticos
+@dataclass
+class Candidato:
+    numero: str
+    nome: str
+    cargo: str
+    foto: str
+
+    def __post_init__(self):
+        # Padronização na criação
+        self.nome = self.nome.upper()
+        self.cargo = self.cargo.upper()
 
     def to_dict(self):
         return {
@@ -16,30 +23,26 @@ class Candidatos:
             "foto": self.foto
         }
 
-class Gerenciador_candidatos:
+class GerenciadorCandidatos:
     def __init__(self):
         self._candidatos = {}
 
-    def add_candidato(self, numero:str, nome :str, cargo: str, foto:str):
-        numero_str= str(numero)
+    def add_candidato(self, numero: str, nome: str, cargo: str, foto: str) -> bool:
+        numero_str = str(numero)
 
         if numero_str in self._candidatos:
-            print(f'Erro: Candidato com número {numero_str} já existe')
-            return False
+            raise ValueError(f"Erro: Candidato com número {numero_str} já existe.")
 
         if not os.path.exists(foto):
-            print(f'O arquivo da foto {foto} nao foi encontrado')
+            # Agora ele bloqueia a criação se a foto não existir
+            raise FileNotFoundError(f"O arquivo da foto '{foto}' não foi encontrado.")
 
-        novo_candidato = Candidatos(numero, nome, cargo, foto)
+        novo_candidato = Candidato(numero_str, nome, cargo, foto)
         self._candidatos[numero_str] = novo_candidato
-        print(f'O candidato {nome} - {numero} foi criado com sucesso')
         return True
 
-    def get_candidato(self, numero:str) -> Candidatos | None :
+    def get_candidato(self, numero: str) -> Candidato | None:
+        return self._candidatos.get(str(numero))
 
-        return self._candidatos.get(str(numero), None)
-
-    def listar_todos(self):
+    def listar_todos(self) -> list[Candidato]:
         return list(self._candidatos.values())
-
-
